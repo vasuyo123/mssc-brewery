@@ -1,6 +1,5 @@
 package com.vjava.micro.msscbrewery.service;
 
-import com.vjava.micro.msscbrewery.model.BeerDto;
 import com.vjava.micro.msscbrewery.model.CustomerDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,13 +21,13 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDto saveCustomer(CustomerDto customerDto) {
         return CustomerDto.builder()
                 .id(UUID.randomUUID())
+                .name(customerDto.getName())
                 .build();
     }
 
     @Override
     public CustomerDto updateCustomer(UUID customerId, CustomerDto customerDto) {
-        CustomerDto customerDto1 = getCustomerById(customerId);
-        return customerDto1;
+        return getCustomerById(customerId);
     }
 
     @Override

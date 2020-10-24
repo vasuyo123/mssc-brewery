@@ -1,4 +1,4 @@
-package com.vjava.micro.msscbrewery.controller.v2;
+package com.vjava.micro.msscbrewery.web.controller.v2;
 
 import com.vjava.micro.msscbrewery.model.v2.BeerDtoV2;
 import com.vjava.micro.msscbrewery.service.v2.BeerServiceV2;
@@ -7,6 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,7 +29,7 @@ public class BeerControllerV2 {
     }
 
     @PostMapping
-    public ResponseEntity<BeerDtoV2> handlePost(@RequestBody BeerDtoV2 beerDto){
+    public ResponseEntity<BeerDtoV2> handlePost(@Valid @RequestBody BeerDtoV2 beerDto){
         BeerDtoV2 savedBeerDto = beerService.saveBeer(beerDto);
 
         HttpHeaders headers = new HttpHeaders();
@@ -34,7 +38,7 @@ public class BeerControllerV2 {
     }
 
     @PutMapping("/{beerId}")
-    public ResponseEntity<BeerDtoV2> handleUpdate(@PathVariable("beerId") UUID beerId, @RequestBody BeerDtoV2 beerDto){
+    public ResponseEntity<BeerDtoV2> handleUpdate(@PathVariable("beerId") UUID beerId, @Valid @RequestBody BeerDtoV2 beerDto){
         BeerDtoV2 savedBeerDto = beerService.updateBeer(beerId, beerDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -45,5 +49,11 @@ public class BeerControllerV2 {
         beerService.deleteBeerById(beerId);
     }
 
-
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<List> validationErrorHandler(ConstraintViolationException constraintViolationException){
+        List<String> errors = new ArrayList<>(constraintViolationException.getConstraintViolations().size());
+        constraintViolationException.getConstraintViolations().
+                forEach(constraintViolation -> errors.add(constraintViolation.getPropertyPath() + ": " + constraintViolation.getMessage()));
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 }
