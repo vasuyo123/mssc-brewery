@@ -2,6 +2,8 @@ package com.vjava.micro.msscbrewery.web.controller.v2;
 
 import com.vjava.micro.msscbrewery.model.v2.BeerDtoV2;
 import com.vjava.micro.msscbrewery.service.v2.BeerServiceV2;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +17,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v2/beer")
+@RequiredArgsConstructor
 public class BeerControllerV2 {
 
     private final BeerServiceV2 beerService;
-
-    public BeerControllerV2(BeerServiceV2 beerService) {
-        this.beerService = beerService;
-    }
 
     @GetMapping({"/{beerId}"})
     public ResponseEntity<BeerDtoV2> getBeer(@PathVariable("beerId") UUID beerId) {
@@ -30,16 +29,16 @@ public class BeerControllerV2 {
 
     @PostMapping
     public ResponseEntity<BeerDtoV2> handlePost(@Valid @RequestBody BeerDtoV2 beerDto){
-        BeerDtoV2 savedBeerDto = beerService.saveBeer(beerDto);
+        val savedBeerDto = beerService.saveBeer(beerDto);
 
-        HttpHeaders headers = new HttpHeaders();
+        val headers = new HttpHeaders();
         headers.add("Location", "http://localhost:8080/api/v1/beer/"+savedBeerDto.getId().toString());
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     @PutMapping("/{beerId}")
     public ResponseEntity<BeerDtoV2> handleUpdate(@PathVariable("beerId") UUID beerId, @Valid @RequestBody BeerDtoV2 beerDto){
-        BeerDtoV2 savedBeerDto = beerService.updateBeer(beerId, beerDto);
+        beerService.updateBeer(beerId, beerDto);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
